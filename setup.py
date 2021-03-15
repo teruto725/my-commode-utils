@@ -1,6 +1,6 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
-VERSION = "0.0.0"
+VERSION = "0.0.0rc2"
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -16,7 +16,9 @@ setup_args = dict(
     long_description=readme,
     install_requires=install_requires,
     license="Apache 2.0",
-    packages=find_packages(),
+    package_data={"commode_utils": ["py.typed"]},
+    packages=["commode_utils"],
+    zip_safe=False,
     author="Egor Spirin",
     author_email="spirin.egor@gmail.com",
     keywords=[],
