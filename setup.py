@@ -11,7 +11,7 @@ with open("requirements.txt") as requirements_file:
 setup_args = dict(
     name="commode-utils",
     version=VERSION,
-    description="Set of useful functions and modules for Code Modelling",
+    description="Set of useful functions and modules for Code Modeling",
     long_description_content_type="text/markdown",
     long_description=readme,
     install_requires=install_requires,
