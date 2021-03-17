@@ -12,10 +12,10 @@ def count_lines_in_file(file_path: str, buffer_size: int = 1024 * 1024) -> int:
     """
     n_lines = 0
     with open(file_path, "rb") as file:
-        file_reader = file.raw.read
+        file_reader = file.read
         buffer = file_reader(buffer_size)
         while buffer:
-            n_lines += buffer.count(b'\n')
+            n_lines += buffer.count(b"\n")
             buffer = file_reader(buffer_size)
     return n_lines
 
@@ -30,7 +30,11 @@ def get_lines_offsets(file_path: str, show_progress_bar: bool = True) -> List[in
     line_offsets: List[int] = []
     cumulative_offset = 0
     with open(file_path, "r") as file:
-        file_iter = tqdm(file, total=count_lines_in_file(file_path)) if show_progress_bar else file
+        file_iter = (
+            tqdm(file, total=count_lines_in_file(file_path))
+            if show_progress_bar
+            else file
+        )
         for line in file_iter:
             line_offsets.append(cumulative_offset)
             cumulative_offset += len(line.encode(file.encoding))
