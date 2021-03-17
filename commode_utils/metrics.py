@@ -18,6 +18,7 @@ class SequentialF1Score(Metric):
         mask_after_pad: bool = True,
         pad_idx: Optional[int] = None,
         ignore_idx: Optional[List[int]] = None,
+        **kwargs,
     ):
         """Initialize the metric for computing f1-score for sequential data.
         This metric is used in many works about code summarization.
@@ -28,7 +29,7 @@ class SequentialF1Score(Metric):
         """
         if mask_after_pad and pad_idx is None:
             raise ValueError("Pass padding index in order to find it first occurrence.")
-        super().__init__()
+        super().__init__(**kwargs)
         self._mask_after_pad = mask_after_pad
         self._pad_idx = pad_idx
         self._ignore_idx = ignore_idx if ignore_idx is not None else []
