@@ -7,12 +7,8 @@ from commode_utils.metrics import SequentialF1Score, ClassificationMetrics
 
 class TestMetrics(unittest.TestCase):
     def test_update(self):
-        predicted = torch.tensor(
-            [[1, 1, 1, 0], [2, 2, 0, -1], [3, 3, -1, -1], [-1, -1, -1, -1]]
-        )
-        target = torch.tensor(
-            [[2, 4, 1, 0], [4, 5, 2, 0], [1, 6, 3, 0], [5, -1, -1, -1]]
-        )
+        predicted = torch.tensor([[1, 1, 1, 0], [2, 2, 0, -1], [3, 3, -1, -1], [-1, -1, -1, -1]])
+        target = torch.tensor([[2, 4, 1, 0], [4, 5, 2, 0], [1, 6, 3, 0], [5, -1, -1, -1]])
         ignore_idx = [-1, 0]
 
         metric = SequentialF1Score(mask_after_pad=False, ignore_idx=ignore_idx)
@@ -57,9 +53,7 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(metric.false_negative, 0)
 
     def test_masking(self):
-        tokens = torch.tensor(
-            [[1, 1, 1, 1], [1, 1, 1, -1], [1, 1, -1, 2], [1, -1, 2, 2]]
-        )
+        tokens = torch.tensor([[1, 1, 1, 1], [1, 1, 1, -1], [1, 1, -1, 2], [1, -1, 2, 2]])
         true_mask = torch.tensor(
             [
                 [False, False, False, False],

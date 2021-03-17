@@ -30,11 +30,7 @@ def get_lines_offsets(file_path: str, show_progress_bar: bool = True) -> List[in
     line_offsets: List[int] = []
     cumulative_offset = 0
     with open(file_path, "r") as file:
-        file_iter = (
-            tqdm(file, total=count_lines_in_file(file_path))
-            if show_progress_bar
-            else file
-        )
+        file_iter = tqdm(file, total=count_lines_in_file(file_path)) if show_progress_bar else file
         for line in file_iter:
             line_offsets.append(cumulative_offset)
             cumulative_offset += len(line.encode(file.encoding))

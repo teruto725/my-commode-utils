@@ -47,10 +47,7 @@ class SequentialF1Score(Metric):
         mask_max_value, mask_max_indices = torch.max(tokens == self._pad_idx, dim=0)
         # if no pad token use len+1 position
         mask_max_indices[~mask_max_value] = tokens.shape[0]
-        mask = (
-            torch.arange(tokens.shape[0], device=tokens.device).view(-1, 1)
-            >= mask_max_indices
-        )
+        mask = torch.arange(tokens.shape[0], device=tokens.device).view(-1, 1) >= mask_max_indices
         return mask
 
     def update(self, predicted: torch.Tensor, target: torch.Tensor):
@@ -62,9 +59,7 @@ class SequentialF1Score(Metric):
         """
         batch_size = target.shape[1]
         if predicted.shape[1] != batch_size:
-            raise ValueError(
-                f"Wrong batch size for prediction (expected: {batch_size}, actual: {predicted.shape[1]})"
-            )
+            raise ValueError(f"Wrong batch size for prediction (expected: {batch_size}, actual: {predicted.shape[1]})")
         if self._mask_after_pad and self._pad_idx is not None:
             after_pad_mask = self._get_after_pad_mask(predicted)
             predicted[after_pad_mask] = self._pad_idx
@@ -72,14 +67,8 @@ class SequentialF1Score(Metric):
                 self._ignore_idx.append(self._pad_idx)
 
         for batch_idx in range(batch_size):
-            target_seq = [
-                token for token in target[:, batch_idx] if token not in self._ignore_idx
-            ]
-            predicted_seq = [
-                token
-                for token in predicted[:, batch_idx]
-                if token not in self._ignore_idx
-            ]
+            target_seq = [token for token in target[:, batch_idx] if token not in self._ignore_idx]
+            predicted_seq = [token for token in predicted[:, batch_idx] if token not in self._ignore_idx]
 
             for predicted_token in predicted_seq:
                 if predicted_token in target_seq:
@@ -102,6 +91,4 @@ class SequentialF1Score(Metric):
             recall = self.true_positive / (self.true_positive + self.false_negative)
         if precision + recall > 0:
             f1_score = 2 * precision * recall / (precision + recall)
-        return ClassificationMetrics(
-            f1_score=f1_score, precision=precision, recall=recall
-        )
+        return ClassificationMetrics(f1_score=f1_score, precision=precision, recall=recall)
