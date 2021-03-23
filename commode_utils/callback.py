@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from os.path import split, join
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import torch
 from pytorch_lightning import Callback, Trainer, LightningModule
