@@ -2,7 +2,7 @@ import pickle
 from abc import abstractmethod
 from collections import Counter
 from os.path import join, exists, dirname
-from typing import Dict, Counter as CounterType
+from typing import Dict, Counter as CounterType, Type
 
 from omegaconf import DictConfig
 from tqdm.auto import tqdm
@@ -62,7 +62,7 @@ class BaseVocabulary:
         raise NotImplementedError()
 
 
-def build_from_scratch(train_data: str, vocabulary_cls: BaseVocabulary):
+def build_from_scratch(train_data: str, vocabulary_cls: Type[BaseVocabulary]):
     total_samples = count_lines_in_file(train_data)
     counters: Dict[str, CounterType[str]] = {
         key: Counter() for key in [vocabulary_cls.LABEL, vocabulary_cls.TOKEN, vocabulary_cls.NODE]
