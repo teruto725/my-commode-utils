@@ -1,15 +1,9 @@
-from dataclasses import dataclass
 from typing import Optional, List
 
 import torch
 from torchmetrics import Metric
 
-
-@dataclass
-class ClassificationMetrics:
-    f1_score: float
-    precision: float
-    recall: float
+from commode_utils.metrics import ClassificationMetrics
 
 
 class SequentialF1Score(Metric):
