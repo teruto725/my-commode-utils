@@ -23,9 +23,10 @@ class Classifier(nn.Module):
         self._attention = LocalAttention(config.classifier_size)
         hidden_layers = []
         for _ in range(config.classifier_layers):
-            hidden_layers.append(
-                [nn.Linear(config.hidden_size, config.hidden_size), self._get_activation(config.activation)]
-            )
+            hidden_layers += [
+                nn.Linear(config.hidden_size, config.hidden_size),
+                self._get_activation(config.activation),
+            ]
         hidden_layers.append(nn.Linear(config.hidden_size, len(vocabulary.label_to_id)))
         self._layers = nn.Sequential(*hidden_layers)
 
