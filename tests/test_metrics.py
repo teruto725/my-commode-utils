@@ -20,25 +20,22 @@ class TestMetrics(unittest.TestCase):
 
     def test_computing_metrics(self):
         metric = SequentialF1Score(mask_after_pad=False)
-        metric.true_positive = 3
-        metric.false_positive = 4
-        metric.false_negative = 7
+        metric.true_positive += 3
+        metric.false_positive += 4
+        metric.false_negative += 7
 
         classification_metrics: ClassificationMetrics = metric.compute()
-        self.assertAlmostEqual(3 / 7, classification_metrics.precision)
-        self.assertAlmostEqual(3 / 10, classification_metrics.recall)
-        self.assertAlmostEqual(6 / 17, classification_metrics.f1_score)
+        self.assertAlmostEqual(3 / 7, classification_metrics.precision.item())
+        self.assertAlmostEqual(3 / 10, classification_metrics.recall.item())
+        self.assertAlmostEqual(6 / 17, classification_metrics.f1_score.item())
 
     def test_computing_zero_metrics(self):
         metric = SequentialF1Score(mask_after_pad=False)
-        metric.true_positive = 0
-        metric.false_positive = 0
-        metric.false_negative = 0
 
         classification_metrics: ClassificationMetrics = metric.compute()
-        self.assertAlmostEqual(0, classification_metrics.precision)
-        self.assertAlmostEqual(0, classification_metrics.recall)
-        self.assertAlmostEqual(0, classification_metrics.f1_score)
+        self.assertAlmostEqual(0, classification_metrics.precision.item())
+        self.assertAlmostEqual(0, classification_metrics.recall.item())
+        self.assertAlmostEqual(0, classification_metrics.f1_score.item())
 
     def test_update_equal_tensors(self):
         predicted = torch.tensor([1, 2, 3, 4, 5, 0, -1]).view(-1, 1)

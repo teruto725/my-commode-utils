@@ -79,11 +79,13 @@ class SequentialF1Score(Metric):
 
         :return: calculated metrics aggregated in data class
         """
-        precision, recall, f1_score = 0.0, 0.0, 0.0
+        precision = self.true_positive
         if self.true_positive + self.false_positive > 0:
             precision = self.true_positive / (self.true_positive + self.false_positive)
+        recall = self.true_positive
         if self.true_positive + self.false_negative > 0:
             recall = self.true_positive / (self.true_positive + self.false_negative)
+        f1_score = 2 * precision * recall
         if precision + recall > 0:
-            f1_score = 2 * precision * recall / (precision + recall)
+            f1_score /= precision + recall
         return ClassificationMetrics(f1_score=f1_score, precision=precision, recall=recall)
