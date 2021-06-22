@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import torch
 from omegaconf import DictConfig
@@ -6,17 +6,14 @@ from torch import nn
 
 from commode_utils.modules import LuongAttention
 from commode_utils.modules.base_decoder_step import BaseDecoderStep, DecoderState
-from commode_utils.vocabulary import BaseVocabulary
 
 
 class LSTMDecoderStep(BaseDecoderStep):
-    def __init__(self, config: DictConfig, vocabulary: BaseVocabulary):
+    def __init__(self, config: DictConfig, output_size: int, pad_idx: Optional[int] = None):
         super().__init__()
         self._decoder_num_layers = config.decoder_num_layers
 
-        self._target_embedding = nn.Embedding(
-            len(vocabulary.label_to_id), config.embedding_size, padding_idx=vocabulary.label_to_id[vocabulary.PAD]
-        )
+        self._target_embedding = nn.Embedding(output_size, config.embedding_size, padding_idx=pad_idx)
 
         self._attention = LuongAttention(config.decoder_size)
 
@@ -31,7 +28,7 @@ class LSTMDecoderStep(BaseDecoderStep):
 
         self._concat_layer = nn.Linear(config.decoder_size * 2, config.decoder_size, bias=False)
         self._norm = nn.LayerNorm(config.decoder_size)
-        self._projection_layer = nn.Linear(config.decoder_size, len(vocabulary.label_to_id), bias=False)
+        self._projection_layer = nn.Linear(config.decoder_size, output_size, bias=False)
 
     def get_initial_state(self, encoder_output: torch.Tensor, attention_mask: torch.Tensor) -> DecoderState:
         initial_state: torch.Tensor = encoder_output.sum(dim=1)  # [batch size; encoder size]
