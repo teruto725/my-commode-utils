@@ -4,7 +4,6 @@ from torch import nn
 
 from commode_utils.modules import LocalAttention
 from commode_utils.training import cut_into_segments
-from commode_utils.vocabulary import BaseVocabulary
 
 
 class Classifier(nn.Module):
@@ -17,7 +16,7 @@ class Classifier(nn.Module):
             return self._activations[activation_name]()
         raise KeyError(f"Activation {activation_name} is not supported")
 
-    def __init__(self, config: DictConfig, vocabulary: BaseVocabulary):
+    def __init__(self, config: DictConfig, output_size: int):
         super().__init__()
 
         self._attention = LocalAttention(config.classifier_size)
@@ -27,7 +26,7 @@ class Classifier(nn.Module):
                 nn.Linear(config.hidden_size, config.hidden_size),
                 self._get_activation(config.activation),
             ]
-        hidden_layers.append(nn.Linear(config.hidden_size, len(vocabulary.label_to_id)))
+        hidden_layers.append(nn.Linear(config.hidden_size, output_size))
         self._layers = nn.Sequential(*hidden_layers)
 
     def forward(self, encoder_output: torch.Tensor, segment_sizes: torch.LongTensor) -> torch.Tensor:

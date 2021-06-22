@@ -3,19 +3,18 @@ from torch import nn
 
 from commode_utils.modules.base_decoder_step import BaseDecoderStep
 from commode_utils.training import cut_into_segments
-from commode_utils.vocabulary import BaseVocabulary
 
 
 class Decoder(nn.Module):
 
     _negative_value = -1e9
 
-    def __init__(self, decoder_step: BaseDecoderStep, vocabulary: BaseVocabulary, teacher_forcing: float = 0.0):
+    def __init__(self, decoder_step: BaseDecoderStep, output_size: int, sos_token: int, teacher_forcing: float = 0.0):
         super().__init__()
         self._decoder_step = decoder_step
         self._teacher_forcing = teacher_forcing
-        self._out_size = len(vocabulary.label_to_id)
-        self._sos_token = vocabulary.label_to_id[vocabulary.SOS]
+        self._out_size = output_size
+        self._sos_token = sos_token
 
     def forward(
         self,
