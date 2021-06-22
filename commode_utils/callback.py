@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from os.path import split, join
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 import torch
 from pytorch_lightning import Callback, Trainer, LightningModule
@@ -24,7 +24,7 @@ class OldEpochEndCallback(Callback):
     def on_train_end(self, trainer: Trainer, pl_module: LightningModule):
         self._is_training = False
 
-    def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule, outputs: Any):
+    def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule, unused: Optional[bool] = None):
         if trainer.val_dataloaders is None:
             self._old_on_epoch_end(trainer)
 
