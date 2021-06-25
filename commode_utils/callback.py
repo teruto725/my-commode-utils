@@ -37,7 +37,7 @@ class PrintEpochResultCallback(Callback):
         self.__split_symbol = split_symbol
 
     def _print_metric(self, logged_metrics: Dict[str, Union[float, torch.Tensor]], step: str):
-        metrics_to_print = {step: []}
+        metrics_to_print: Dict[str, List] = {step: []}
         for key, value in logged_metrics.items():
             if self.__split_symbol not in key:
                 continue
