@@ -45,7 +45,7 @@ class Decoder(nn.Module):
                 current_input, batched_encoder_output, attention_mask, decoder_state
             )
             output[step] = current_output
-            if target_sequence is not None and torch.rand(1) <= self._teacher_forcing:
+            if self.training and target_sequence is not None and torch.rand(1) <= self._teacher_forcing:
                 current_input = target_sequence[step]
             else:
                 current_input = output[step].argmax(dim=-1)
