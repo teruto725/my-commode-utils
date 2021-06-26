@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -17,7 +17,7 @@ setup_args = dict(
     install_requires=install_requires,
     license="Apache 2.0",
     package_data={"commode_utils": ["py.typed"]},
-    packages=["commode_utils", "commode_utils.metrics", "commode_utils.modules"],
+    packages=["commode_utils", "commode_utils.metrics", "commode_utils.modules", "commode_utils.losses"],
     zip_safe=False,
     author="Egor Spirin",
     author_email="spirin.egor@gmail.com",
