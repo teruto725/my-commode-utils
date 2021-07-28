@@ -35,31 +35,35 @@ class PrintEpochResultCallback(Callback):
         self.__after_test = after_test
         self.__split_symbol = split_symbol
 
-    def _print_metric(self, logged_metrics: Dict[str, Union[float, torch.Tensor]], step: str):
-        metrics_to_print: Dict[str, List] = {step: []}
+    def _get_values(self, logged_metrics: Dict[str, Union[float, torch.Tensor]], step: str) -> List:
+        values = []
         for key, value in logged_metrics.items():
             if self.__split_symbol not in key:
                 continue
             group, metric = key.split(self.__split_symbol, 1)
-            if group != step:
+            if group not in step:
                 continue
             if isinstance(value, torch.Tensor):
                 value = value.item()
-            metrics_to_print[group].append(f"{metric} = {round(value, 2)}")
-        if len(metrics_to_print[step]) > 0:
-            print_table(metrics_to_print)
+            values.append(f"{metric} = {round(value, 2)}")
+        return values
 
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule, unused: Optional[bool] = None):
         if not self.__after_train:
             return
-        self._print_metric(trainer.logged_metrics, "train")
+        metric = {"train": self._get_values(trainer.logged_metrics, "train")}
+        if f"val{self.__split_symbol}loss" in trainer.logged_metrics:
+            metric["val"] = self._get_values(trainer.logged_metrics, "val")
+        print_table(metric)
 
     def on_validation_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
         if not self.__after_validation:
             return
-        self._print_metric(trainer.logged_metrics, "val")
+        metric = {"val": self._get_values(trainer.logged_metrics, "val")}
+        print_table(metric)
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
         if not self.__after_test:
             return
-        self._print_metric(trainer.logged_metrics, "test")
+        metric = {"test": self._get_values(trainer.logged_metrics, "test")}
+        print_table(metric)
