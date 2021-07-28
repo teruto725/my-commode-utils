@@ -2,9 +2,8 @@ import pickle
 from abc import abstractmethod
 from collections import Counter
 from os.path import join, exists, dirname
-from typing import Dict, Counter as CounterType, Type
+from typing import Dict, Counter as CounterType, Type, Optional
 
-from omegaconf import DictConfig
 from tqdm.auto import tqdm
 
 from commode_utils.filesystem import count_lines_in_file
@@ -24,8 +23,7 @@ class BaseVocabulary:
     TOKEN = "token"
     NODE = "node"
 
-    def __init__(self, config: DictConfig, data_folder: str):
-        vocabulary_file = join(data_folder, config.name, self.vocab_filename)
+    def __init__(self, vocabulary_file: str, max_labels: Optional[int] = None, max_tokens: Optional[int] = None):
         if not exists(vocabulary_file):
             raise ValueError(f"Can't find vocabulary file ({vocabulary_file})")
         with open(vocabulary_file, "rb") as f_in:
@@ -33,12 +31,12 @@ class BaseVocabulary:
 
         self._label_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
         self._label_to_id.update(
-            (token[0], i + 4) for i, token in enumerate(self._counters[self.LABEL].most_common(config.max_labels))
+            (token[0], i + 4) for i, token in enumerate(self._counters[self.LABEL].most_common(max_labels))
         )
 
         self._token_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
         self._token_to_id.update(
-            (token[0], i + 4) for i, token in enumerate(self._counters[self.TOKEN].most_common(config.max_tokens))
+            (token[0], i + 4) for i, token in enumerate(self._counters[self.TOKEN].most_common(max_tokens))
         )
 
         self._node_to_id = {self.PAD: 0, self.UNK: 1}
