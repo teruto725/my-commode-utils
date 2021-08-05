@@ -10,13 +10,9 @@ class SequenceCrossEntropyLoss(nn.CrossEntropyLoss):
     :param reduction: rule to reduce computed loss over batch.
     """
 
-    __known_reductions = {"mean": lambda loss: loss.mean(), "sum": lambda loss: loss.sum()}
-
     def __init__(self, pad_idx: Optional[int] = None, reduction: Optional[str] = "mean"):
         super().__init__()
         self.__pad_idx = pad_idx
-        if reduction is not None and reduction not in self.__known_reductions.keys():
-            raise ValueError(f"Unknown reduction: {reduction}")
         self.__reduction = reduction
 
     def forward(self, logits: Tensor, target: Tensor) -> Tensor:
@@ -26,6 +22,7 @@ class SequenceCrossEntropyLoss(nn.CrossEntropyLoss):
         :param target: tensor with target classes with shape [seq len; batch size]
         :return:
         """
+        seq_len, batch_size = target.shape
         # [batch size; vocab size; seq length]
         _logits = logits.permute(1, 2, 0)
         # [batch size; seq length]
@@ -36,13 +33,17 @@ class SequenceCrossEntropyLoss(nn.CrossEntropyLoss):
             # [batch size; seq length]
             mask = _labels != self.__pad_idx
             seq_len = mask.sum(-1)
-            # [batch size]
-            example_loss = (loss * mask).sum(-1) / seq_len
+            # [batch size; seq length]
+            example_loss = loss * mask
         else:
-            # [batch size]
-            example_loss = loss.mean(-1)
+            # [batch size; seq length]
+            example_loss = loss
 
         if self.__reduction is None:
             return example_loss
-        else:
-            return self.__known_reductions[self.__reduction](example_loss)
+        elif self.__reduction == "seq-mean":
+            return (example_loss.sum(-1) / seq_len).mean()
+        elif self.__reduction == "seq-sum":
+            return (example_loss.sum(-1) / seq_len).sum()
+        elif self.__reduction == "batch-mean":
+            return example_loss.sum() / batch_size

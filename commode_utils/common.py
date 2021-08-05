@@ -7,10 +7,12 @@ from omegaconf import DictConfig
 
 def download_dataset(url: str, dataset_dir: str, dataset_name: str):
     download_dir = dirname(dataset_dir)
+    print(f"Downloading {dataset_name} from {url} to {dataset_dir}")
     download_command_result = subprocess.run(["wget", url, "-P", download_dir], capture_output=True, encoding="utf-8")
     if download_command_result.returncode != 0:
         raise RuntimeError(f"Failed to download dataset. Error:\n{download_command_result.stderr}")
     tar_name = join(download_dir, f"{dataset_name}.tar.gz")
+    print(f"Extracting from {tar_name}")
     untar_command_result = subprocess.run(
         ["tar", "-xzvf", tar_name, "-C", download_dir], capture_output=True, encoding="utf-8"
     )
