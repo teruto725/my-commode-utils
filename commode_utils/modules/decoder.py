@@ -38,9 +38,10 @@ class Decoder(nn.Module):
 
         # [output size; batch size; vocab size]
         output = batched_encoder_output.new_zeros((output_size, batch_size, self._out_size))
+        output[0:, :, self._sos_token] = 1
         # [batch size]
         current_input = batched_encoder_output.new_full((batch_size,), self._sos_token, dtype=torch.long)
-        for step in range(output_size):
+        for step in range(1, output_size):
             current_output, decoder_state = self._decoder_step(
                 current_input, batched_encoder_output, attention_mask, decoder_state
             )

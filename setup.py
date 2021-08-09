@@ -1,12 +1,18 @@
 from setuptools import setup
 
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
 with open("requirements.txt") as requirements_file:
-    install_requires = [line.strip() for line in requirements_file]
+    install_requires = [
+        "tqdm >= 4.49.0",
+        "torchmetrics >= 0.4.1",
+        "torch >= 1.9.0",
+        "omegaconf >= 2.1.0",
+        "pytorch_lightning >= 1.4.0",
+    ]
 
 setup_args = dict(
     name="commode-utils",
