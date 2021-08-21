@@ -23,10 +23,10 @@ class Classifier(nn.Module):
         hidden_layers = []
         for _ in range(config.classifier_layers):
             hidden_layers += [
-                nn.Linear(config.hidden_size, config.hidden_size),
+                nn.Linear(config.classifier_size, config.classifier_size),
                 self._get_activation(config.activation),
             ]
-        hidden_layers.append(nn.Linear(config.hidden_size, output_size))
+        hidden_layers.append(nn.Linear(config.classifier_size, output_size))
         self._layers = nn.Sequential(*hidden_layers)
 
     def forward(self, encoder_output: torch.Tensor, segment_sizes: torch.LongTensor) -> torch.Tensor:
