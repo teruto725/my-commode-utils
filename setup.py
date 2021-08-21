@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = "0.3.7"
+VERSION = "0.3.8"
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
