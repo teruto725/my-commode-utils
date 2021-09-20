@@ -1,26 +1,37 @@
-from os.path import split, join
+from os import walk
+from os.path import join
 from typing import Dict, List, Optional, Union
 
 import torch
 from pytorch_lightning import Callback, Trainer, LightningModule
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 
 from commode_utils.common import print_table
 
 
-class UploadCheckpointCallback(Callback):
-    """Upload checkpoints after every validation epoch. Works only for wandb."""
+class ModelCheckpointWithUpload(ModelCheckpoint):
+    """Extend basic model checkpoint callback for immediate upload weights. Works only for wandb."""
 
-    def __init__(self, checkpoint_dir: str):
-        super().__init__()
-        self._checkpoint_dir = checkpoint_dir
+    _CKPT_EXTENSION = ".ckpt"
 
-    def on_validation_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
-        logger = trainer.logger
-        if isinstance(logger, WandbLogger):
-            experiment = logger.experiment
-            root_dir, _ = split(self._checkpoint_dir)
-            experiment.save(join(self._checkpoint_dir, "*.ckpt"), base_path=root_dir)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._uploaded = []
+
+    def save_checkpoint(self, trainer: Trainer, unused: Optional[LightningModule] = None) -> None:
+        super().save_checkpoint(trainer, unused)
+        if not isinstance(trainer.logger, WandbLogger) or self.dirpath is None:
+            return
+        wandb_experiment = trainer.logger.experiment
+        for root, _, files in walk(self.dirpath):
+            for file in files:
+                if not file.endswith(self._CKPT_EXTENSION):
+                    continue
+                if file in self._uploaded:
+                    continue
+                wandb_experiment.save(join(root, file), base_path=self.dirpath)
+                self._uploaded.append(file)
 
 
 class PrintEpochResultCallback(Callback):
