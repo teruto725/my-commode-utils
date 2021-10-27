@@ -2,7 +2,7 @@ import pickle
 from abc import abstractmethod
 from collections import Counter
 from os.path import join, exists, dirname
-from typing import Dict, Counter as CounterType, Type, Optional
+from typing import Dict, Counter as TCounter, Type, Optional, List
 
 from tqdm.auto import tqdm
 
@@ -23,21 +23,19 @@ class BaseVocabulary:
     TOKEN = "token"
     NODE = "node"
 
-    def __init__(self, vocabulary_file: str, max_labels: Optional[int] = None, max_tokens: Optional[int] = None):
+    def __init__(self, vocabulary_file: str, labels_count: Optional[int] = None, tokens_count: Optional[int] = None):
         if not exists(vocabulary_file):
             raise ValueError(f"Can't find vocabulary file ({vocabulary_file})")
         with open(vocabulary_file, "rb") as f_in:
-            self._counters: Dict[str, CounterType[str]] = pickle.load(f_in)
+            self._counters: Dict[str, TCounter[str]] = pickle.load(f_in)
 
         self._label_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
-        self._label_to_id.update(
-            (token[0], i + 4) for i, token in enumerate(self._counters[self.LABEL].most_common(max_labels))
-        )
+        labels = self._extract_tokens_by_count(self._counters[self.LABEL], labels_count)
+        self._label_to_id.update((token[0], i + 4) for i, token in enumerate(labels))
 
         self._token_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
-        self._token_to_id.update(
-            (token[0], i + 4) for i, token in enumerate(self._counters[self.TOKEN].most_common(max_tokens))
-        )
+        tokens = self._extract_tokens_by_count(self._counters[self.TOKEN], tokens_count)
+        self._token_to_id.update((token[0], i + 4) for i, token in enumerate(tokens))
 
         self._node_to_id = {self.PAD: 0, self.UNK: 1}
         self._node_to_id.update((token, i + 2) for i, token in enumerate(self._counters[self.NODE]))
@@ -56,13 +54,21 @@ class BaseVocabulary:
 
     @staticmethod
     @abstractmethod
-    def process_raw_sample(raw_sample: str, counters: Dict[str, CounterType[str]]):
+    def process_raw_sample(raw_sample: str, counters: Dict[str, TCounter[str]]):
         raise NotImplementedError()
+
+    @staticmethod
+    def _extract_tokens_by_count(counter: TCounter, count_border: Optional[int]) -> List[str]:
+        words, counts = zip(*counter.most_common())
+        if count_border is None:
+            return words
+        border = [i for i, c in enumerate(counts) if c < count_border][0]
+        return words[:border]
 
 
 def build_from_scratch(train_data: str, vocabulary_cls: Type[BaseVocabulary]):
     total_samples = count_lines_in_file(train_data)
-    counters: Dict[str, CounterType[str]] = {
+    counters: Dict[str, TCounter[str]] = {
         key: Counter() for key in [vocabulary_cls.LABEL, vocabulary_cls.TOKEN, vocabulary_cls.NODE]
     }
     with open(train_data, "r") as f_in:
