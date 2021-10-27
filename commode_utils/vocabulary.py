@@ -31,11 +31,11 @@ class BaseVocabulary:
 
         self._label_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
         labels = self._extract_tokens_by_count(self._counters[self.LABEL], labels_count)
-        self._label_to_id.update((token[0], i + 4) for i, token in enumerate(labels))
+        self._label_to_id.update((token, i + 4) for i, token in enumerate(labels))
 
         self._token_to_id = {self.PAD: 0, self.UNK: 1, self.SOS: 2, self.EOS: 3}
         tokens = self._extract_tokens_by_count(self._counters[self.TOKEN], tokens_count)
-        self._token_to_id.update((token[0], i + 4) for i, token in enumerate(tokens))
+        self._token_to_id.update((token, i + 4) for i, token in enumerate(tokens))
 
         self._node_to_id = {self.PAD: 0, self.UNK: 1}
         self._node_to_id.update((token, i + 2) for i, token in enumerate(self._counters[self.NODE]))
