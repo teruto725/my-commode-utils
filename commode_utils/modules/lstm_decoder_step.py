@@ -43,7 +43,7 @@ class LSTMDecoderStep(BaseDecoderStep):
         encoder_output: torch.Tensor,
         attention_mask: torch.Tensor,
         decoder_state: DecoderState,
-    ) -> Tuple[torch.Tensor, DecoderState]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, DecoderState]:
         h_prev, c_prev = decoder_state
 
         # [batch size; 1; embedding size]
@@ -71,4 +71,4 @@ class LSTMDecoderStep(BaseDecoderStep):
         # [batch size; vocab size]
         output = self._projection_layer(concat)
 
-        return output, (h_prev, c_prev)
+        return output, attn_weights, (h_prev, c_prev)

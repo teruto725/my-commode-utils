@@ -25,13 +25,16 @@ class BaseDecoderStep(nn.Module):
         encoder_output: torch.Tensor,
         attention_mask: torch.Tensor,
         decoder_state: DecoderState,
-    ) -> Tuple[torch.Tensor, DecoderState]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, DecoderState]:
         """Perform one decoder step based on input token and encoder output.
 
         :param input_token: [batch size] -- tokens from previous step or from target sequence
         :param encoder_output: [batch size; max seq len; encoder size] -- encoder output
         :param attention_mask: [batch size; max seq len] -- mask with zeros on non pad elements
         :param decoder_state: decoder state from previous or initial step
-        :return: [batch size; vocab size] -- logits and new decoder step
+        :return:
+            [batch size; vocab size] -- logits
+            [batch size; encoder seq length] -- attention weights
+            new decoder state
         """
         raise NotImplementedError()
