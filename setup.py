@@ -1,17 +1,18 @@
 from setuptools import setup
 
-VERSION = "0.3.12"
+VERSION = "0.4.0"
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
 with open("requirements.txt") as requirements_file:
     install_requires = [
-        "tqdm >= 4.49.0",
-        "torchmetrics >= 0.4.1",
-        "torch >= 1.9.0",
+        "tqdm >= 4.62.0",
+        "torchmetrics >= 0.6.0",
+        "torch >= 1.10.0",
         "omegaconf >= 2.1.0",
-        "pytorch_lightning >= 1.4.0",
+        "pytorch_lightning >= 1.5.0",
+        "sacrebleu >= 2.0.0",
     ]
 
 setup_args = dict(

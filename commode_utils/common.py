@@ -1,6 +1,6 @@
 import subprocess
 from os.path import dirname, join
-from typing import Dict, List
+from typing import Dict, List, Sequence, Optional
 
 from omegaconf import DictConfig
 
@@ -42,3 +42,10 @@ def print_config(config: DictConfig, fields: List[str]):
             continue
         config_data[column] = [f"{k}: {v}" for k, v in config[column].items()]
     print_table(config_data)
+
+
+def decode(tokens: Sequence[int], id2token: Dict[int, str], ignore_idx: Optional[List[int]] = None) -> List[str]:
+    if ignore_idx is None:
+        ignore_idx = []
+    output = [id2token[it] for it in tokens if it not in ignore_idx]
+    return output
