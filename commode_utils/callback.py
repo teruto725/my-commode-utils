@@ -19,8 +19,8 @@ class ModelCheckpointWithUpload(ModelCheckpoint):
         super().__init__(*args, **kwargs)
         self._uploaded = []
 
-    def save_checkpoint(self, trainer: Trainer, unused: Optional[LightningModule] = None) -> None:
-        super().save_checkpoint(trainer, unused)
+    def save_checkpoint(self, trainer: Trainer) -> None:
+        super().save_checkpoint(trainer)
         if not isinstance(trainer.logger, WandbLogger) or self.dirpath is None:
             return
         wandb_experiment = trainer.logger.experiment
