@@ -8,7 +8,7 @@ from commode_utils.common import decode
 
 
 class ChrF(Metric):
-    def __init__(self, id2label: [Dict[int, str]], ignore_indexes: Optional[List[int]] = None, **kwargs):
+    def __init__(self, id2label: Dict[int, str], ignore_indexes: Optional[List[int]] = None, **kwargs):
         super().__init__(**kwargs)
         self.__id2label = id2label
         if ignore_indexes is None:
