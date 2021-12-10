@@ -59,11 +59,9 @@ class BaseVocabulary:
 
     @staticmethod
     def _extract_tokens_by_count(counter: TCounter, count_border: Optional[int]) -> List[str]:
-        words, counts = zip(*counter.most_common())
         if count_border is None:
-            return words
-        border = [i for i, c in enumerate(counts) if c < count_border][0]
-        return words[:border]
+            return list(counter.keys())
+        return [w for w, c in counter.most_common() if c >= count_border]
 
 
 def build_from_scratch(train_data: str, vocabulary_cls: Type[BaseVocabulary]):
