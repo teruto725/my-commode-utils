@@ -11,24 +11,26 @@ from commode_utils.modules.base_decoder_step import BaseDecoderStep, DecoderStat
 class LSTMDecoderStep(BaseDecoderStep):
     def __init__(self, config: DictConfig, output_size: int, pad_idx: Optional[int] = None):
         super().__init__()
+        decoder_size = config.decoder_size +100
+        
         self._decoder_num_layers = config.decoder_num_layers
 
         self._target_embedding = nn.Embedding(output_size, config.embedding_size, padding_idx=pad_idx)
 
-        self._attention = LuongAttention(config.decoder_size)
+        self._attention = LuongAttention(decoder_size)
 
         self._decoder_lstm = nn.LSTM(
             config.embedding_size,
-            config.decoder_size,
+            decoder_size,
             num_layers=config.decoder_num_layers,
             dropout=config.rnn_dropout if config.decoder_num_layers > 1 else 0,
             batch_first=True,
         )
         self._dropout_rnn = nn.Dropout(config.rnn_dropout)
 
-        self._concat_layer = nn.Linear(config.decoder_size * 2, config.decoder_size, bias=False)
-        self._norm = nn.LayerNorm(config.decoder_size)
-        self._projection_layer = nn.Linear(config.decoder_size, output_size, bias=False)
+        self._concat_layer = nn.Linear(decoder_size * 2, decoder_size, bias=False)
+        self._norm = nn.LayerNorm(decoder_size)
+        self._projection_layer = nn.Linear(decoder_size, output_size, bias=False)
 
     def get_initial_state(self, encoder_output: torch.Tensor, attention_mask: torch.Tensor) -> DecoderState:
         initial_state: torch.Tensor = encoder_output.sum(dim=1)  # [batch size; encoder size]
